@@ -1,86 +1,255 @@
 ---
 title: 'Quickstart'
-description: 'Start building awesome documentation in under 5 minutes'
+description: 'Generate and execute your first script.'
 ---
 
-## Setup your development
+## Generate and execute a script
 
-Learn how to update your docs locally and and deploy them to the public.
+<Steps>
+  <Step title="Generate API key">
+    Sign up on our [dashboard](https://scrapybara.com/dashboard). An API key will be generated for you automatically. You can copy and manage your keys on the [API keys page](https://scrapybara.com/keys).
+  </Step>
+  <Step title="Generate a script">
+    Try generating a script to scrape a website. You can use the [generate dashboard](https://scrapybara.com/generate) or the [/generate API](/api-reference/script-generation/generate-script).
+    <CodeGroup>
 
-### Edit and preview
+      ```python Python
+      import requests
 
-<AccordionGroup>
-  <Accordion icon="github" title="Clone your docs locally">
-    During the onboarding process, we created a repository on your Github with
-    your docs content. You can find this repository on our
-    [dashboard](https://dashboard.mintlify.com). To clone the repository
-    locally, follow these
-    [instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
-    in your terminal.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Preview changes">
-    Previewing helps you make sure your changes look as intended. We built a
-    command line interface to render these changes locally. 1. Install the
-    [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview the
-    documentation changes locally with this command: ``` npm i -g mintlify ```
-    2. Run the following command at the root of your documentation (where
-    `mint.json` is): ``` mintlify dev ```
-  </Accordion>
-</AccordionGroup>
+      url = "https://news.ycombinator.com/"
+      command = "Get all post details from the Hacker News homepage"
+      output_schema = {
+          "type": "array",
+          "items": {
+              "type": "object",
+              "properties": {
+                  "title": {"type": "string"},
+                  "url": {"type": "string"},
+                  "points": {"type": "integer"},
+                  "author": {"type": "string"},
+                  "comments": {"type": "integer"}
+              }
+          }
+      }
 
-### Deploy your changes
+      headers = {
+          "x-api-key": "YOUR_API_KEY_HERE"
+      }
 
-<AccordionGroup>
+      data = {
+          "url": url,
+          "command": command,
+          "output_schema": output_schema,
+      }
 
-<Accordion icon="message-bot" title="Install our Github app">
-  Our Github app automatically deploys your changes to your docs site, so you
-  don't need to manage deployments yourself. You can find the link to install on
-  your [dashboard](https://dashboard.mintlify.com). Once the bot has been
-  successfully installed, there should be a check mark next to the commit hash
-  of the repo.
-</Accordion>
-<Accordion icon="rocket" title="Push your changes">
-  [Commit and push your changes to
-  Git](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository#about-git-push)
-  for your changes to update in your docs site. If you push and don't see that
-  the Github app successfully deployed your changes, you can also manually
-  update your docs through our [dashboard](https://dashboard.mintlify.com).
-</Accordion>
+      response = requests.post("https://api.scrapybara.com/v1/scripts/generate", headers=headers, json=data)
+      script_id = response.json()["id"]
+      print(script_id)
+      ```
 
-</AccordionGroup>
+      ```javascript JavaScript
+      const url = "https://news.ycombinator.com/";
+      const command = "Get all post details from the Hacker News homepage";
+      const outputSchema = {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            title: {type: "string"},
+            url: {type: "string"},
+            points: {type: "integer"},
+            author: {type: "string"},
+            comments: {type: "integer"}
+          }
+        }
+      };
 
-## Update your docs
+      const data = {
+        url,
+        command,
+        output_schema: outputSchema
+      };
 
-Add content directly in your files with MDX syntax and React components. You can use any of our components, or even build your own.
+      fetch("https://api.scrapybara.com/v1/scripts/generate", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-api-key": "YOUR_API_KEY_HERE"
+        },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(data => {
+          const scriptId = data.id;
+          console.log(scriptId);
+        });
+      ```
 
-<CardGroup>
+      ```go Go
+      package main
 
-<Card title="Style Your Docs" icon="paintbrush" href="/settings/global">
-  Add flair to your docs with personalized branding.
-</Card>
+      import (
+          "fmt"
+          "strings"
+          "net/http"
+          "io/ioutil"
+      )
 
-<Card
-  title="Add API Endpoints"
-  icon="square-code"
-  href="/api-playground/configuration"
->
-  Implement your OpenAPI spec and enable API user interaction.
-</Card>
+      func main() {
+          url := "https://api.scrapybara.com/v1/scripts/generate"
 
-<Card
-  title="Integrate Analytics"
-  icon="chart-mixed"
-  href="/analytics/supported-integrations"
->
-  Draw insights from user interactions with your documentation.
-</Card>
+          payload := strings.NewReader(`{
+              "url": "https://news.ycombinator.com/",
+              "command": "Get all post details from the Hacker News homepage",
+              "output_schema": {
+                  "type": "array",
+                  "items": {
+                      "type": "object",
+                      "properties": {
+                          "title": {"type": "string"},
+                          "url": {"type": "string"},
+                          "points": {"type": "integer"},
+                          "author": {"type": "string"},
+                          "comments": {"type": "integer"}
+                      }
+                  }
+              }
+          }`)
 
-<Card
-  title="Host on a Custom Domain"
-  icon="browser"
-  href="/settings/custom-domain/subdomain"
->
-  Keep your docs on your own website's subdomain.
-</Card>
+          req, _ := http.NewRequest("POST", url, payload)
 
+          req.Header.Add("x-api-key", "YOUR_API_KEY_HERE")
+          req.Header.Add("Content-Type", "application/json")
+
+          res, _ := http.DefaultClient.Do(req)
+
+          defer res.Body.Close()
+          body, _ := ioutil.ReadAll(res.Body)
+
+          var result map[string]string
+          json.Unmarshal(body, &result)
+
+          scriptId := result["id"]
+          fmt.Println(scriptId)
+      }
+      ```
+
+      ```bash cURL
+      curl -X POST "https://api.scrapybara.com/v1/scripts/generate" \
+           -H "Content-Type: application/json" \
+           -H "x-api-key: YOUR_API_KEY_HERE" \
+           -d '{
+             "url": "https://news.ycombinator.com/",
+             "command": "Get all post details from the Hacker News homepage",
+             "output_schema": {
+               "type": "array",
+               "items": {
+                 "type": "object",
+                 "properties": {
+                   "title": {"type": "string"},
+                   "url": {"type": "string"},
+                  "points": {"type": "integer"},
+                   "author": {"type": "string"},
+                   "comments": {"type": "integer"}
+                 }
+               }
+             }
+           }'
+      ```
+    </CodeGroup>
+  </Step>
+  <Step title="Execute a script">
+    Now execute the script you generated with the script ID. You can use the [execute dashboard](https://scrapybara.com/execute) or the [/execute API](/api-reference/script-execution/execute-script).
+    <CodeGroup>
+      ```python Python
+      import requests
+
+      headers = {
+          "x-api-key": "YOUR_API_KEY_HERE"
+      }
+
+      data = {
+          "script_id": script_id,
+          "url": url,
+      }
+
+      response = requests.post("https://api.scrapybara.com/v1/scripts/execute", headers=headers, json=data)
+      print(response.json())
+      ```
+
+      ```javascript JavaScript
+      const data = {
+        script_id: scriptId,
+        url,
+      };
+
+      fetch("https://api.scrapybara.com/v1/scripts/execute", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-api-key": "YOUR_API_KEY_HERE"
+        },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(data => console.log(data));
+      ```
+
+      ```go Go
+      package main
+
+      import (
+        "fmt"
+        "strings"
+        "net/http"
+        "io/ioutil"
+      )
+
+      func main() {
+        url := "https://api.scrapybara.com/v1/scripts/execute"
+
+        payload := strings.NewReader(`{
+          "script_id": scriptId,
+          "url": url
+        }`)
+
+        req, _ := http.NewRequest("POST", url, payload)
+
+        req.Header.Add("x-api-key", "YOUR_API_KEY_HERE")
+        req.Header.Add("Content-Type", "application/json")
+
+        res, _ := http.DefaultClient.Do(req)
+
+        defer res.Body.Close()
+        body, _ := ioutil.ReadAll(res.Body)
+
+        fmt.Println(res)
+        fmt.Println(string(body))
+      }
+      ```
+
+      ```bash cURL
+      curl -X POST "https://api.scrapybara.com/v1/scripts/execute" \
+           -H "Content-Type: application/json" \
+           -H "x-api-key: YOUR_API_KEY_HERE" \
+           -d '{
+             "script_id": "YOUR_SCRIPT_ID_HERE",
+             "url": "https://news.ycombinator.com/"
+           }'
+      ```
+    </CodeGroup>
+  </Step>
+</Steps>
+
+## Start building
+
+Be sure to check out our other resources to learn more. Happy scraping! ₍ᐢ•(ܫ)•ᐢ₎
+
+<CardGroup cols={2}>
+  <Card title="API reference" icon="code" href="/api-reference">
+    Check out our API reference docs.
+  </Card>
+  <Card title="Cookbook" icon="hat-chef" href="https://github.com/scrapybara/scrapybara-cookbook">
+    Check out our cookbook for more examples.
+  </Card>
 </CardGroup>

@@ -1,130 +1,226 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Scrapybara API",
+    "version": "1.0.0",
+    "description": "Scrapybara API provides web automation, capybara-style. It allows users to generate, execute, and manage scripts."
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
+      "url": "https://api.scrapybara.com/v1",
+      "description": "Scrapybara API"
     }
   ],
   "paths": {
-    "/plants": {
+    "/scripts/generate": {
+      "post": {
+        "summary": "Generate script",
+        "description": "Auto-generates a new script. Use 'streaming' to get real-time updates on the script generation process.",
+        "operationId": "generateScript",
+        "tags": ["Script Generation"],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScriptGenerationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with the generated script ID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "title": "None-streaming response",
+                      "$ref": "#/components/schemas/ScriptGenerationResponse"
+                    },
+                    {
+                      "title": "Streaming response",
+                      "$ref": "#/components/schemas/ScriptGenerationStreamingResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key."
+          }
+        }
+      }
+    },
+    "/scripts/execute": {
+      "post": {
+        "summary": "Execute script",
+        "description": "Executes a previously generated script.",
+        "operationId": "executeScript",
+        "tags": ["Script Execution"],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScriptExecutionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with the execution results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "title": "Non-streaming response",
+                      "$ref": "#/components/schemas/ScriptExecutionResponse"
+                    },
+                    {
+                      "title": "Streaming response",
+                      "$ref": "#/components/schemas/ScriptExecutionStreamingResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key."
+          }
+        }
+      }
+    },
+    "/scripts/{script_id}": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "summary": "Get script",
+        "description": "Retrieves detailed information about a specific script.",
+        "operationId": "getScript",
+        "tags": ["Script Management"],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
+            "name": "script_id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the script.",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Successful response with script details.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/ScriptDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key."
+          },
+          "404": {
+            "description": "Script not found - The specified script ID does not exist."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete script",
+        "description": "Permanently removes a script from the system.",
+        "operationId": "deleteScript",
+        "tags": ["Script Management"],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "script_id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the script to be deleted.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Script deleted successfully."
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key."
+          },
+          "404": {
+            "description": "Script not found - The specified script ID does not exist."
+          }
+        }
+      }
+    },
+    "/fetch": {
+      "post": {
+        "summary": "Fetch HTML",
+        "description": "Retrieves the HTML content of a specified URL, useful for preliminary data inspection.",
+        "operationId": "fetchHtml",
+        "tags": ["Helpers"],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FetchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with the fetched HTML content.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "html": {
+                      "type": "string",
+                      "description": "The raw HTML content of the requested URL."
+                    }
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key."
           }
         }
       }
@@ -132,63 +228,192 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "ScriptGenerationRequest": {
         "type": "object",
+        "required": ["url", "command"],
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "url": {
+            "type": "string",
+            "description": "The target URL for the script."
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "command": {
+            "type": "string",
+            "description": "The action to be performed by the script."
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Optional step-by-step instructions for complex actions."
+          },
+          "streaming": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, the response will be streamed as it's generated."
+          },
+          "input_schema": {
+            "type": "object",
+            "description": "Optional schema defining the structure of input data."
+          },
+          "output_schema": {
+            "type": "object",
+            "description": "Optional schema defining the expected structure of output data."
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "ScriptGenerationResponse": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the generated script."
+          }
+        },
+        "required": ["id"]
+      },
+      "ScriptGenerationStreamingResponse": {
+        "type": "object",
+        "properties": {
+          "script_id": {
+            "type": "string",
+            "description": "Unique identifier for the generated script."
           },
-          "message": {
-            "type": "string"
+          "status": {
+            "type": "string",
+            "description": "The current status of script generation (e.g., 'in_progress', 'completed', 'error')."
+          },
+          "status_description": {
+            "type": "string",
+            "description": "Additional details about the generation status or errors."
+          },
+          "current_script": {
+            "type": "string",
+            "description": "The current version of the generated script."
+          },
+          "current_script_execution_result": {
+            "type": "string",
+            "description": "The result of executing the current version of the script."
+          },
+          "reasoning": {
+            "type": "string",
+            "description": "Explanation of the reasoning behind the current script version."
+          }
+        },
+        "required": ["script_id", "status", "status_description"]
+      },
+      "ScriptExecutionRequest": {
+        "type": "object",
+        "required": ["script_id"],
+        "properties": {
+          "script_id": {
+            "type": "string",
+            "description": "Unique identifier of the script to be executed."
+          },
+          "streaming": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, the execution results will be streamed as they're generated."
+          },
+          "magic": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, applies advanced processing to improve data extraction results."
+          },
+          "url": {
+            "type": "string",
+            "description": "Optional URL to override the script's default target URL."
+          }
+        }
+      },
+      "ScriptExecutionResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "The execution status (e.g., 'in_progress', 'completed', 'error')."
+          },
+
+          "status_description": {
+            "type": "string",
+            "description": "Additional details about the execution status or errors."
+          },
+          "result": {
+            "type": "object",
+            "description": "The data extracted by the script."
+          }
+        },
+        "required": ["status", "status_description", "result"]
+      },
+      "ScriptExecutionStreamingResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "The current execution status (e.g., 'in_progress', 'completed', 'error')."
+          },
+
+          "status_description": {
+            "type": "string",
+            "description": "Additional details about the current execution status or errors."
+          },
+          "result": {
+            "type": "object",
+            "description": "The data extracted by the script."
+          }
+        },
+        "required": ["status", "status_description"]
+      },
+      "ScriptDetails": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the script."
+          },
+          "url": {
+            "type": "string",
+            "description": "The target URL for the script."
+          },
+          "command": {
+            "type": "string",
+            "description": "The original action or instructions."
+          },
+          "steps": {
+            "type": "object",
+            "description": "Detailed steps for the action."
+          },
+          "content": {
+            "type": "string",
+            "description": "The actual code content of the script."
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the script (e.g., 'pending', 'completed', 'error')."
+          },
+          "status_description": {
+            "type": "string",
+            "description": "Additional details about the script's status."
+          }
+        }
+      },
+      "FetchRequest": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The URL of the webpage to fetch HTML content from."
           }
         }
       }
     },
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "Your Scrapybara API key. Manage your keys on the [API keys page](https://scrapybara.com/keys)."
       }
     }
   }

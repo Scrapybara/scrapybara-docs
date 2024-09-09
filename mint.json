@@ -15,12 +15,7 @@
       "to": "#9e7aff"
     }
   },
-  "topbarLinks": [
-    {
-      "name": "Support",
-      "url": "mailto:hello@scrapybara.com"
-    }
-  ],
+  "topbarLinks": [],
   "topbarCtaButton": {
     "name": "Dashboard",
     "url": "https://scrapybara.com/dashboard"
@@ -28,31 +23,26 @@
   "tabs": [
     {
       "name": "API Reference",
-      "url": "api-reference"
+      "url": "api-reference",
+      "openapi": "/api-reference/openapi.json"
     }
   ],
   "anchors": [
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.gg/8HNm8xsw"
+    },
+    {
+      "name": "Cookbook",
+      "icon": "hat-chef",
+      "url": "https://github.com/scrapybara/scrapybara-cookbook"
+    }
   ],
   "navigation": [
     {
       "group": "Get Started",
-      "pages": [
-        "introduction"
-      ]
-    },
-    {
-      "group": "API Documentation",
-      "pages": [
-        "api-reference/introduction"
-      ]
-    },
-    {
-      "group": "Endpoint Examples",
-      "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
-      ]
+      "pages": ["introduction", "quickstart"]
     }
   ],
   "footerSocials": {
