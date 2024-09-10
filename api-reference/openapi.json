@@ -28,7 +28,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ScriptGenerationRequest"
+                "$ref": "#/components/schemas/GenerateScriptRequest"
               }
             }
           }
@@ -39,16 +39,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "title": "None-streaming response",
-                      "$ref": "#/components/schemas/ScriptGenerationResponse"
-                    },
-                    {
-                      "title": "Streaming response",
-                      "$ref": "#/components/schemas/ScriptGenerationStreamingResponse"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/GenerateScriptResponse"
                 }
               }
             }
@@ -75,7 +66,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ScriptExecutionRequest"
+                "$ref": "#/components/schemas/ExecuteScriptRequest"
               }
             }
           }
@@ -86,16 +77,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "title": "Non-streaming response",
-                      "$ref": "#/components/schemas/ScriptExecutionResponse"
-                    },
-                    {
-                      "title": "Streaming response",
-                      "$ref": "#/components/schemas/ScriptExecutionStreamingResponse"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/ExecuteScriptResponse"
                 }
               }
             }
@@ -134,7 +116,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ScriptDetails"
+                  "$ref": "#/components/schemas/GetScriptResponse"
                 }
               }
             }
@@ -197,7 +179,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FetchRequest"
+                "$ref": "#/components/schemas/FetchHtmlRequest"
               }
             }
           }
@@ -208,13 +190,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "html": {
-                      "type": "string",
-                      "description": "The raw HTML content of the requested URL."
-                    }
-                  }
+                  "$ref": "#/components/schemas/FetchHtmlResponse"
                 }
               }
             }
@@ -228,7 +204,7 @@
   },
   "components": {
     "schemas": {
-      "ScriptGenerationRequest": {
+      "GenerateScriptRequest": {
         "type": "object",
         "required": ["url", "command"],
         "properties": {
@@ -262,17 +238,39 @@
           }
         }
       },
-      "ScriptGenerationResponse": {
+      "GenerateScriptResponse": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "streaming",
+          "mapping": {
+            "false": "#/components/schemas/GenerateScriptNonStreamingResponse",
+            "true": "#/components/schemas/GenerateScriptStreamingResponse"
+          }
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/GenerateScriptNonStreamingResponse"
+          },
+          {
+            "$ref": "#/components/schemas/GenerateScriptStreamingResponse"
+          }
+        ]
+      },
+      "GenerateScriptNonStreamingResponse": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "description": "Unique identifier for the generated script."
+          },
+          "streaming": {
+            "type": "boolean",
+            "enum": [false]
           }
         },
-        "required": ["id"]
+        "required": ["id", "streaming"]
       },
-      "ScriptGenerationStreamingResponse": {
+      "GenerateScriptStreamingResponse": {
         "type": "object",
         "properties": {
           "script_id": {
@@ -298,11 +296,15 @@
           "reasoning": {
             "type": "string",
             "description": "Explanation of the reasoning behind the current script version."
+          },
+          "streaming": {
+            "type": "boolean",
+            "enum": [true]
           }
         },
-        "required": ["script_id", "status", "status_description"]
+        "required": ["script_id", "status", "status_description", "streaming"]
       },
-      "ScriptExecutionRequest": {
+      "ExecuteScriptRequest": {
         "type": "object",
         "required": ["script_id"],
         "properties": {
@@ -326,14 +328,31 @@
           }
         }
       },
-      "ScriptExecutionResponse": {
+      "ExecuteScriptResponse": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "streaming",
+          "mapping": {
+            "false": "#/components/schemas/ExecuteScriptNonStreamingResponse",
+            "true": "#/components/schemas/ExecuteScriptStreamingResponse"
+          }
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ExecuteScriptNonStreamingResponse"
+          },
+          {
+            "$ref": "#/components/schemas/ExecuteScriptStreamingResponse"
+          }
+        ]
+      },
+      "ExecuteScriptNonStreamingResponse": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "description": "The execution status (e.g., 'in_progress', 'completed', 'error')."
+            "description": "The execution status (e.g., 'completed', 'error')."
           },
-
           "status_description": {
             "type": "string",
             "description": "Additional details about the execution status or errors."
@@ -341,18 +360,21 @@
           "result": {
             "type": "object",
             "description": "The data extracted by the script."
+          },
+          "streaming": {
+            "type": "boolean",
+            "enum": [false]
           }
         },
-        "required": ["status", "status_description", "result"]
+        "required": ["status", "status_description", "result", "streaming"]
       },
-      "ScriptExecutionStreamingResponse": {
+      "ExecuteScriptStreamingResponse": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
             "description": "The current execution status (e.g., 'in_progress', 'completed', 'error')."
           },
-
           "status_description": {
             "type": "string",
             "description": "Additional details about the current execution status or errors."
@@ -360,11 +382,15 @@
           "result": {
             "type": "object",
             "description": "The data extracted by the script."
+          },
+          "streaming": {
+            "type": "boolean",
+            "enum": [true]
           }
         },
-        "required": ["status", "status_description"]
+        "required": ["status", "status_description", "streaming"]
       },
-      "ScriptDetails": {
+      "GetScriptResponse": {
         "type": "object",
         "properties": {
           "id": {
@@ -397,13 +423,22 @@
           }
         }
       },
-      "FetchRequest": {
+      "FetchHtmlRequest": {
         "type": "object",
         "required": ["url"],
         "properties": {
           "url": {
             "type": "string",
             "description": "The URL of the webpage to fetch HTML content from."
+          }
+        }
+      },
+      "FetchHtmlResponse": {
+        "type": "object",
+        "properties": {
+          "html": {
+            "type": "string",
+            "description": "The raw HTML content of the requested URL."
           }
         }
       }
