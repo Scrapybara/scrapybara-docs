@@ -15,7 +15,7 @@
     "/scripts/generate": {
       "post": {
         "summary": "Generate script",
-        "description": "Auto-generates a new script. Use 'streaming' to get real-time updates on the script generation process.",
+        "description": "Auto-generates a new script.",
         "operationId": "generateScript",
         "tags": ["Script Generation"],
         "security": [
@@ -223,11 +223,6 @@
             },
             "description": "Optional step-by-step instructions for complex actions."
           },
-          "streaming": {
-            "type": "boolean",
-            "default": false,
-            "description": "If true, the response will be streamed as it's generated."
-          },
           "input_schema": {
             "type": "object",
             "description": "Optional schema defining the structure of input data."
@@ -240,69 +235,13 @@
       },
       "GenerateScriptResponse": {
         "type": "object",
-        "discriminator": {
-          "propertyName": "streaming",
-          "mapping": {
-            "false": "#/components/schemas/GenerateScriptNonStreamingResponse",
-            "true": "#/components/schemas/GenerateScriptStreamingResponse"
-          }
-        },
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/GenerateScriptNonStreamingResponse"
-          },
-          {
-            "$ref": "#/components/schemas/GenerateScriptStreamingResponse"
-          }
-        ]
-      },
-      "GenerateScriptNonStreamingResponse": {
-        "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "description": "Unique identifier for the generated script."
-          },
-          "streaming": {
-            "type": "boolean",
-            "enum": [false]
           }
         },
-        "required": ["id", "streaming"]
-      },
-      "GenerateScriptStreamingResponse": {
-        "type": "object",
-        "properties": {
-          "script_id": {
-            "type": "string",
-            "description": "Unique identifier for the generated script."
-          },
-          "status": {
-            "type": "string",
-            "description": "The current status of script generation (e.g., 'in_progress', 'completed', 'error')."
-          },
-          "status_description": {
-            "type": "string",
-            "description": "Additional details about the generation status or errors."
-          },
-          "current_script": {
-            "type": "string",
-            "description": "The current version of the generated script."
-          },
-          "current_script_execution_result": {
-            "type": "string",
-            "description": "The result of executing the current version of the script."
-          },
-          "reasoning": {
-            "type": "string",
-            "description": "Explanation of the reasoning behind the current script version."
-          },
-          "streaming": {
-            "type": "boolean",
-            "enum": [true]
-          }
-        },
-        "required": ["script_id", "status", "status_description", "streaming"]
+        "required": ["id"]
       },
       "ExecuteScriptRequest": {
         "type": "object",
@@ -311,11 +250,6 @@
           "script_id": {
             "type": "string",
             "description": "Unique identifier of the script to be executed."
-          },
-          "streaming": {
-            "type": "boolean",
-            "default": false,
-            "description": "If true, the execution results will be streamed as they're generated."
           },
           "magic": {
             "type": "boolean",
@@ -330,24 +264,6 @@
       },
       "ExecuteScriptResponse": {
         "type": "object",
-        "discriminator": {
-          "propertyName": "streaming",
-          "mapping": {
-            "false": "#/components/schemas/ExecuteScriptNonStreamingResponse",
-            "true": "#/components/schemas/ExecuteScriptStreamingResponse"
-          }
-        },
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/ExecuteScriptNonStreamingResponse"
-          },
-          {
-            "$ref": "#/components/schemas/ExecuteScriptStreamingResponse"
-          }
-        ]
-      },
-      "ExecuteScriptNonStreamingResponse": {
-        "type": "object",
         "properties": {
           "status": {
             "type": "string",
@@ -360,35 +276,9 @@
           "result": {
             "type": "object",
             "description": "The data extracted by the script."
-          },
-          "streaming": {
-            "type": "boolean",
-            "enum": [false]
           }
         },
-        "required": ["status", "status_description", "result", "streaming"]
-      },
-      "ExecuteScriptStreamingResponse": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "description": "The current execution status (e.g., 'in_progress', 'completed', 'error')."
-          },
-          "status_description": {
-            "type": "string",
-            "description": "Additional details about the current execution status or errors."
-          },
-          "result": {
-            "type": "object",
-            "description": "The data extracted by the script."
-          },
-          "streaming": {
-            "type": "boolean",
-            "enum": [true]
-          }
-        },
-        "required": ["status", "status_description", "streaming"]
+        "required": ["status", "status_description", "result"]
       },
       "GetScriptResponse": {
         "type": "object",
