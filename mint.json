@@ -43,6 +43,10 @@
     {
       "group": "Get Started",
       "pages": ["introduction", "quickstart"]
+    },
+    {
+      "group": "Using the API",
+      "pages": ["api-reference/getting-started", "api-reference/python", "api-reference/typescript"]
     }
   ],
   "footerSocials": {

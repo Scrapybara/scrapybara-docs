@@ -1,0 +1,51 @@
+---
+title: TypeScript SDK
+---
+
+<Note>
+The TypeScript SDK is in beta. If you have any feedback, please open an issue on GitHub.
+</Note>
+
+## Installation
+
+```bash
+npm install scrapybara
+# or
+yarn add scrapybara
+# or
+pnpm add scrapybara
+# or
+bun add scrapybara
+```
+
+## Usage
+
+```typescript
+import { ScrapybaraClient } from "scrapybara";
+
+const client = new ScrapybaraClient("your-api-key");
+
+const response = await client.generateScript({
+  url: "https://news.ycombinator.com",
+  command: "Scrape all posts",
+});
+```
+
+## Links
+
+<CardGroup cols={2}>
+  <Card
+    title="GitHub repository"
+    icon="github"
+    href="https://github.com/scrapybara/scrapybara-ts"
+  >
+    View the TypeScript SDK source code
+  </Card>
+  <Card
+    title="npm package"
+    icon="npm"
+    href="https://www.npmjs.com/package/scrapybara"
+  >
+    View the Scrapybara package on npm
+  </Card>
+</CardGroup>

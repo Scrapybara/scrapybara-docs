@@ -1,0 +1,19 @@
+---
+title: Getting started
+---
+
+## Base URL
+
+All requests include the following base URL:
+
+```bash
+https://api.scrapybara.com/v1
+```
+
+## Authentication
+
+All requests to the Scrapybara API must include an `x-api-key` header with your API key. If you are using the client SDKs, you will set the API when constructing a client, and then the SDK will send the header on your behalf with every request.
+
+## Content types
+
+The Scrapybara API always accepts JSON in request bodies and returns JSON in response bodies. You will need to send the `content-type: application/json header` in requests. If you are using the client SDKs, this will be taken care of automatically.

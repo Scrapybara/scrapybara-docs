@@ -1,0 +1,47 @@
+---
+title: Python SDK
+---
+
+<Note>
+The Python SDK is in beta. If you have any feedback, please open an issue on GitHub.
+</Note>
+
+## Installation
+
+```bash
+pip install scrapybara
+```
+
+## Usage
+
+```python
+from scrapybara import ScrapybaraClient
+
+client = ScrapybaraClient("your-api-key")
+
+response = client.generate_script(
+    {
+        "url": "https://news.ycombinator.com",
+        "command": "Scrape all posts"
+    }
+)
+```
+
+## Links
+
+<CardGroup cols={2}>
+  <Card
+    title="GitHub repository"
+    icon="github"
+    href="https://github.com/scrapybara/scrapybara-python"
+  >
+    View the Python SDK source code
+  </Card>
+  <Card
+    title="PyPI package"
+    icon="python"
+    href="https://pypi.org/project/scrapybara/"
+  >
+    View the Scrapybara package on PyPI
+  </Card>
+</CardGroup>
