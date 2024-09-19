@@ -7,12 +7,15 @@
   },
   "favicon": "/icon.png",
   "colors": {
-    "primary": "#9e7aff",
-    "light": "#9e7aff",
-    "dark": "#9e7aff",
+    "primary": "#422e23",
+    "light": "#fff4e6",
+    "dark": "#422e23",
     "anchors": {
-      "from": "#9e7aff",
-      "to": "#9e7aff"
+      "from": "#422e23",
+      "to": "#422e23"
+    },
+    "background": {
+      "light": "#fff4e6"
     }
   },
   "topbarLinks": [],
@@ -46,7 +49,11 @@
     },
     {
       "group": "Using the API",
-      "pages": ["api-reference/getting-started", "api-reference/python", "api-reference/typescript"]
+      "pages": [
+        "api-reference/getting-started",
+        "api-reference/python",
+        "api-reference/typescript"
+      ]
     }
   ],
   "footerSocials": {
